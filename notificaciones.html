@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Notificaciones - NOMY</title>
+  <link rel="stylesheet" href="estilo.css" />
+</head>
+<body>
+  <div id="contenedor-principal">
+    <header><h1>NOMY</h1></header>
+
+    <nav id="sidebar">
+      <a href="perfil.html" title="Perfil">
+        <img src="https://img.icons8.com/material-outlined/24/000000/user--v1.png" alt="Perfil" />
+      </a>
+      <a href="notificaciones.html" title="Notificaciones">
+        <img src="https://img.icons8.com/material-outlined/24/000000/appointment-reminders--v1.png" alt="Notificaciones" />
+      </a>
+      <a href="envios.html" title="Envios">
+        <img src="https://img.icons8.com/material-outlined/24/000000/send-letter.png" alt="Envios" />
+      </a>
+      <a href="horario.html" title="Horario">
+        <img src="https://img.icons8.com/material-outlined/24/000000/calendar--v1.png" alt="Horario" />
+      </a>
+    </nav>
+
+    <main id="main-content">
+      <section id="notificaciones" class="section active">
+        <h2>Notificaciones</h2>
+        <div id="lista-notificaciones"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    function cargarUsuario() {
+      const usuarioJSON = sessionStorage.getItem('usuario');
+      if (!usuarioJSON) {
+        window.location.href = 'index.html';
+        return null;
+      }
+      return JSON.parse(usuarioJSON);
+    }
+
+    function cargarComunicados() {
+      // Guardamos en localStorage para simular base de datos
+      const mensajesJSON = localStorage.getItem('comunicados');
+      if (!mensajesJSON) return [];
+      return JSON.parse(mensajesJSON);
+    }
+
+    function mostrarNotificaciones() {
+      const usuario = cargarUsuario();
+      if (!usuario) return;
+
+      // Solo estudiantes pueden ver los mensajes de docente y directiva
+      const comunicados = cargarComunicados();
+
+      let html = '';
+      const mensajesVisibles = comunicados.filter(c => c.rol === 'docente' || c.rol === 'directiva');
+
+      if (mensajesVisibles.length === 0) {
+        html = '<p>No hay notificaciones disponibles.</p>';
+      } else {
+        mensajesVisibles.forEach(c => {
+          html += `<div class="comunicado"><b>${c.rol}</b> (${c.fecha}): <br>${c.mensaje}</div>`;
+        });
+      }
+      document.getElementById('lista-notificaciones').innerHTML = html;
+    }
+
+    mostrarNotificaciones();
+  </script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Perfil - NOMY</title>
+  <link rel="stylesheet" href="estilo.css" />
+</head>
+<body>
+  <div id="contenedor-principal">
+    <header><h1>NOMY</h1></header>
+
+    <nav id="sidebar">
+      <a href="perfil.html" title="Perfil">
+        <img src="https://img.icons8.com/material-outlined/24/000000/user--v1.png" alt="Perfil" />
+      </a>
+      <a href="notificaciones.html" title="Notificaciones">
+        <img src="https://img.icons8.com/material-outlined/24/000000/appointment-reminders--v1.png" alt="Notificaciones" />
+      </a>
+      <a href="envios.html" title="Envios">
+        <img src="https://img.icons8.com/material-outlined/24/000000/send-letter.png" alt="Envios" />
+      </a>
+      <a href="horario.html" title="Horario">
+        <img src="https://img.icons8.com/material-outlined/24/000000/calendar--v1.png" alt="Horario" />
+      </a>
+    </nav>
+
+    <main id="main-content">
+      <section id="perfil" class="section active">
+        <h2>Perfil</h2>
+        <p><b>Nombre:</b> <span id="nombre-usuario"></span></p>
+        <p><b>Correo:</b> <span id="correo-usuario"></span></p>
+        <p><b>Rol:</b> <span id="rol-usuario"></span></p>
+        <button id="editar-perfil">Editar Perfil</button>
+
+        <form id="perfil-form" style="display:none; margin-top:20px;">
+          <label for="nombre">Nombre:</label>
+          <input type="text" id="nombre" required />
+          <label for="correo">Correo:</label>
+          <input type="email" id="correo" required />
+          <label for="rol">Selecciona tu rol:</label>
+          <select id="rol" required>
+            <option value="">Seleccione</option>
+            <option value="docente">Docente</option>
+            <option value="directiva">Directiva</option>
+            <option value="estudiante">Estudiante</option>
+          </select>
+          <button type="submit">Guardar</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    function cargarUsuario() {
+      const usuarioJSON = sessionStorage.getItem('usuario');
+      if (!usuarioJSON) {
+        // Si no hay usuario guardado, redirigir al login
+        window.location.href = 'index.html';
+        return;
+      }
+      const usuario = JSON.parse(usuarioJSON);
+      document.getElementById('nombre-usuario').textContent = usuario.nombre;
+      document.getElementById('correo-usuario').textContent = usuario.correo;
+      document.getElementById('rol-usuario').textContent = usuario.rol;
+
+      // También llenar formulario para editar
+      document.getElementById('nombre').value = usuario.nombre;
+      document.getElementById('correo').value = usuario.correo;
+      document.getElementById('rol').value = usuario.rol;
+    }
+
+    document.getElementById('editar-perfil').addEventListener('click', () => {
+      document.getElementById('perfil-form').style.display = 'block';
+    });
+
+    document.getElementById('perfil-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const nombre = document.getElementById('nombre').value.trim();
+      const correo = document.getElementById('correo').value.trim();
+      const rol = document.getElementById('rol').value;
+
+      if (!nombre || !correo || !rol) {
+        alert('Por favor llena todos los campos.');
+        return;
+      }
+
+      const usuario = { nombre, correo, rol };
+      sessionStorage.setItem('usuario', JSON.stringify(usuario));
+
+      alert('Perfil actualizado');
+      cargarUsuario();
+      document.getElementById('perfil-form').style.display = 'none';
+    });
+
+    cargarUsuario();
+  </script>
+</body>
+</html>

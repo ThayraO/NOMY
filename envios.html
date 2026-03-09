@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Envios - NOMY</title>
+  <link rel="stylesheet" href="estilo.css" />
+</head>
+<body>
+  <div id="contenedor-principal">
+    <header><h1>NOMY</h1></header>
+
+    <nav id="sidebar">
+      <a href="perfil.html" title="Perfil">
+        <img src="https://img.icons8.com/material-outlined/24/000000/user--v1.png" alt="Perfil" />
+      </a>
+      <a href="notificaciones.html" title="Notificaciones">
+        <img src="https://img.icons8.com/material-outlined/24/000000/appointment-reminders--v1.png" alt="Notificaciones" />
+      </a>
+      <a href="envios.html" title="Envios">
+        <img src="https://img.icons8.com/material-outlined/24/000000/send-letter.png" alt="Envios" />
+      </a>
+      <a href="horario.html" title="Horario">
+        <img src="https://img.icons8.com/material-outlined/24/000000/calendar--v1.png" alt="Horario" />
+      </a>
+    </nav>
+
+    <main id="main-content">
+      <section id="envios" class="section active">
+        <h2>Enviar Comunicado</h2>
+        <form id="form-envio">
+          <label for="comunicado-text">Mensaje:</label>
+          <textarea id="comunicado-text" rows="4" required></textarea>
+          <button type="submit">Enviar</button>
+        </form>
+
+        <div id="envios-realizados">
+          <h3>Comunicados enviados</h3>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    function cargarUsuario() {
+      const usuarioJSON = sessionStorage.getItem('usuario');
+      if (!usuarioJSON) {
+        window.location.href = 'index.html';
+        return null;
+      }
+      return JSON.parse(usuarioJSON);
+    }
+
+    function cargarComunicados() {
+      const mensajesJSON = localStorage.getItem('comunicados');
+      if (!mensajesJSON) return [];
+      return JSON.parse(mensajesJSON);
+    }
+
+    function guardarComunicados(comunicados) {
+      localStorage.setItem('comunicados', JSON.stringify(comunicados));
+    }
+
+    function mostrarEnvios() {
+      const comunicados = cargarComunicados();
+      let html = '<h3>Comunicados enviados</h3>';
+      if (comunicados.length === 0) {
+        html += '<p>No hay comunicados enviados.</p>';
+      } else {
+        comunicados.forEach(com => {
+          html += `<div class="comunicado"><b>${com.rol}</b> (${com.fecha}): <br>${com.mensaje}</div>`;
+        });
+      }
+      document.getElementById('envios-realizados').innerHTML = html;
+    }
+
+    document.getElementById('form-envio').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const usuario = cargarUsuario();
+      if (!usuario) return;
+
+      if (usuario.rol !== 'docente' && usuario.rol !== 'directiva') {
+        alert('Solo docentes y directiva pueden enviar comunicados.');
+        return;
+      }
+
+      const mensaje = document.getElementById('comunicado-text').value.trim();
+      if (!mensaje) {
+        alert('El mensaje no puede estar vacío.');
+        return;
+      }
+
+      const comunicados = cargarComunicados();
+      comunicados.push({
+        mensaje,
+        rol: usuario.rol,
+        fecha: new Date().toLocaleString()
+      });
+      guardarComunicados(comunicados);
+
+      document.getElementById('comunicado-text').value = '';
+      alert('Comunicado enviado.');
+      mostrarEnvios();
+    });
+
+    mostrarEnvios();
+  </script>
+</body>
+</html>
